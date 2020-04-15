@@ -9,6 +9,7 @@ import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
 import org.kodein.di.generic.provider
 import org.kodein.di.generic.singleton
+import xyz.hirantha.jajoplayer.data.db.AppDatabase
 import xyz.hirantha.jajoplayer.data.repository.MediaRepository
 import xyz.hirantha.jajoplayer.data.repository.MediaRepositoryImpl
 import xyz.hirantha.jajoplayer.ui.home.HomeViewModelFactory
@@ -23,8 +24,12 @@ class JajoPlayerApplication : MultiDexApplication(), KodeinAware {
     override val kodein: Kodein = Kodein.lazy {
         import(androidXModule(this@JajoPlayerApplication))
 
+        // database
+        bind() from singleton { AppDatabase(instance()) }
+        bind() from singleton { instance<AppDatabase>().getSongsDao() }
+
         bind<MediaRepository>() with singleton {
-            MediaRepositoryImpl(instance())
+            MediaRepositoryImpl(instance(), instance())
         }
 
         bind() from provider { HomeViewModelFactory(instance()) }

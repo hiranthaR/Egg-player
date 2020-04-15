@@ -4,5 +4,5 @@ import androidx.lifecycle.LiveData
 import xyz.hirantha.jajoplayer.models.Song
 
 interface MediaRepository {
-    fun getSongs():LiveData<List<Song>>
+    suspend fun getSongs():LiveData<List<Song>>
 }

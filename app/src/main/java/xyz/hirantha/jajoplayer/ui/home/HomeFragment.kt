@@ -36,7 +36,7 @@ class HomeFragment : ScopedFragment(), KodeinAware {
     }
 
     private fun bindUI() = launch {
-        viewModel.getSongs().observe(viewLifecycleOwner, Observer {
+        viewModel.songs.await().observe(viewLifecycleOwner, Observer {
             if (it == null) return@Observer
             Log.e("songs", it.toString())
         })

@@ -2,8 +2,12 @@ package xyz.hirantha.jajoplayer.models
 
 import android.database.Cursor
 import android.provider.MediaStore
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
+@Entity(tableName = "songs")
 data class Song(
+    @PrimaryKey(autoGenerate = false)
     val id: Long,
     val title: String,
     val albumId: Long,

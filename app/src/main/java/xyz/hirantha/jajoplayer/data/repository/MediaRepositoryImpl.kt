@@ -4,10 +4,16 @@ import android.content.Context
 import android.provider.MediaStore
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import xyz.hirantha.jajoplayer.data.db.dao.SongsDao
 import xyz.hirantha.jajoplayer.models.Song
 
 class MediaRepositoryImpl(
-    private val context: Context
+    private val context: Context,
+    private val songsDao: SongsDao
 ) : MediaRepository {
 
     private val songProjection = arrayOf(
@@ -26,20 +32,30 @@ class MediaRepositoryImpl(
 
     private val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0"
 
-    override fun getSongs(): LiveData<List<Song>> {
-        val cursor = context.contentResolver.query(
-            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-            songProjection,
-            selection,
-            null,
-            MediaStore.Audio.Media.TITLE
-        )
-        val songs = mutableListOf<Song>()
-        cursor?.let {
-            while (cursor.moveToNext()) {
-                songs.add(Song(cursor))
+    override suspend fun getSongs(): LiveData<List<Song>> {
+        return withContext(Dispatchers.IO) {
+            val cursor = context.contentResolver.query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                songProjection,
+                selection,
+                null,
+                MediaStore.Audio.Media.TITLE
+            )
+            val songs = mutableListOf<Song>()
+            cursor?.let {
+                while (cursor.moveToNext()) {
+                    songs.add(Song(cursor))
+                }
             }
+            persistSongs(songs)
+            return@withContext songsDao.getSongs()
         }
-        return MutableLiveData<List<Song>>(songs)
+    }
+
+    private fun persistSongs(songs: List<Song>) {
+        GlobalScope.launch(Dispatchers.IO) {
+            songsDao.deleteAll()
+            songsDao.upsertSongs(songs)
+        }
     }
 }
