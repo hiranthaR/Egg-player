@@ -1,0 +1,2 @@
+rootProject.name='Jajo Player'
+include ':app'
