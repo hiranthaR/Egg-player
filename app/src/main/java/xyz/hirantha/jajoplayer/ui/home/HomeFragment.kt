@@ -7,9 +7,11 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.home_fragment.*
+import kotlinx.android.synthetic.main.player_bottom_sheet.*
 import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -41,6 +43,9 @@ class HomeFragment : ScopedFragment(), KodeinAware {
     }
 
     private fun bindUI() = launch {
+
+        var bottomSheetBehavior = BottomSheetBehavior.from(player_bottom_sheet)
+
         viewModel.songs.await().observe(viewLifecycleOwner, Observer {
             if (it == null) return@Observer
             initRecyclerView(it.toSongItems())
