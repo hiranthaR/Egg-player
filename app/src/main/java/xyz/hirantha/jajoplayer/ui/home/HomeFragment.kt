@@ -1,5 +1,12 @@
 package xyz.hirantha.jajoplayer.ui.home
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,8 +26,14 @@ import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
 import xyz.hirantha.jajoplayer.R
+import xyz.hirantha.jajoplayer.internal.Playable
 import xyz.hirantha.jajoplayer.internal.ScopedFragment
 import xyz.hirantha.jajoplayer.models.Song
+import xyz.hirantha.jajoplayer.notification.CreateNotification
+import xyz.hirantha.jajoplayer.player.JajoPlayer
+import xyz.hirantha.jajoplayer.services.OnClearFromRecentService
+import xyz.hirantha.jajoplayer.services.RECEIVER_INTENT
+import xyz.hirantha.jajoplayer.services.RECEIVER_INTENT_ACTION_NAME
 import xyz.hirantha.jajoplayer.ui.listitems.SongListItem
 
 class HomeFragment : ScopedFragment(), KodeinAware {
@@ -28,6 +41,35 @@ class HomeFragment : ScopedFragment(), KodeinAware {
     override val kodein: Kodein by closestKodein()
     private lateinit var viewModel: HomeViewModel
     private val viewModelFactory: HomeViewModelFactory by instance()
+    private var notificationManager: NotificationManager? = null
+    private var position = 0
+    private var isPlaying = false
+    private var broadcastReceiver: BroadcastReceiver
+    private var songs: List<Song>? = null
+
+    private val jajoPlayer: JajoPlayer by instance()
+
+    init {
+        broadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+//                when (intent?.extras?.getString(RECEIVER_INTENT_ACTION_NAME)) {
+//                    CreateNotification.ACTION_PREVIOUS -> {
+//                        onTrackPrevious()
+//                    }
+//                    CreateNotification.ACTION_PLAY -> {
+//                        onTrackPlay()
+//                    }
+//                    CreateNotification.ACTION_PAUSE -> {
+//                        onTrackPause()
+//                    }
+//                    CreateNotification.ACTION_NEXT -> {
+//                        onTrackNext()
+//                    }
+//                }
+            }
+
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,6 +82,27 @@ class HomeFragment : ScopedFragment(), KodeinAware {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(HomeViewModel::class.java)
         bindUI()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createChannel()
+            activity?.registerReceiver(broadcastReceiver, IntentFilter(RECEIVER_INTENT))
+            activity?.startService(Intent(context!!, OnClearFromRecentService::class.java))
+        }
+
+    }
+
+    private fun createChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                CreateNotification.CANNEL_ID,
+                "Jajo Player",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            notificationManager = activity?.getSystemService(NotificationManager::class.java)
+            notificationManager?.apply {
+                createNotificationChannel(notificationChannel)
+            }
+        }
     }
 
     private fun bindUI() = launch {
@@ -49,7 +112,13 @@ class HomeFragment : ScopedFragment(), KodeinAware {
         viewModel.songs.await().observe(viewLifecycleOwner, Observer {
             if (it == null) return@Observer
             initRecyclerView(it.toSongItems())
+            songs = it
         })
+
+        btn_play.setOnClickListener { _ ->
+            //            if (isPlaying) onTrackPause()
+//            else onTrackPlay()
+        }
     }
 
     private fun List<Song>.toSongItems(): List<SongListItem> {
@@ -63,7 +132,7 @@ class HomeFragment : ScopedFragment(), KodeinAware {
             addAll(items)
             setOnItemClickListener { item, _ ->
                 (item as? SongListItem)?.let {
-
+                    jajoPlayer.playSong(item.song)
                 }
             }
         }
@@ -71,5 +140,13 @@ class HomeFragment : ScopedFragment(), KodeinAware {
             layoutManager = LinearLayoutManager(context)
             adapter = groupAdapter
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationManager?.cancelAll()
+        }
+        activity?.unregisterReceiver(broadcastReceiver)
     }
 }

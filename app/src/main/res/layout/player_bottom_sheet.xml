@@ -28,4 +28,13 @@
         app:layout_constraintStart_toEndOf="@id/img_song_cover"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageButton
+        android:id="@+id/btn_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_play_arrow"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/img_song_cover"
+        app:layout_constraintTop_toBottomOf="@id/tv_song_title" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

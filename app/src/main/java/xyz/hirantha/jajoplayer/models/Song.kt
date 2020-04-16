@@ -1,6 +1,7 @@
 package xyz.hirantha.jajoplayer.models
 
 import android.database.Cursor
+import android.net.Uri
 import android.provider.MediaStore
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -34,4 +35,6 @@ data class Song(
         cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)),
         cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK))
     )
+
+    fun getUri() = Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id.toString())
 }

@@ -12,6 +12,9 @@ import org.kodein.di.generic.singleton
 import xyz.hirantha.jajoplayer.data.db.AppDatabase
 import xyz.hirantha.jajoplayer.data.repository.MediaRepository
 import xyz.hirantha.jajoplayer.data.repository.MediaRepositoryImpl
+import xyz.hirantha.jajoplayer.player.JajoPlayer
+import xyz.hirantha.jajoplayer.player.PlayListHandler
+import xyz.hirantha.jajoplayer.player.PlayListHandlerImpl
 import xyz.hirantha.jajoplayer.ui.home.HomeViewModelFactory
 
 class JajoPlayerApplication : MultiDexApplication(), KodeinAware {
@@ -32,6 +35,9 @@ class JajoPlayerApplication : MultiDexApplication(), KodeinAware {
             MediaRepositoryImpl(instance(), instance())
         }
 
-        bind() from provider { HomeViewModelFactory(instance()) }
+        bind<PlayListHandler>() with singleton { PlayListHandlerImpl(instance(), instance()) }
+        bind() from singleton { JajoPlayer(instance()) }
+
+        bind() from provider { HomeViewModelFactory(instance(),instance()) }
     }
 }
