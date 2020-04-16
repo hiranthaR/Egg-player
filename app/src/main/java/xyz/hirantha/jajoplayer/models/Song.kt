@@ -1,9 +1,11 @@
 package xyz.hirantha.jajoplayer.models
 
+import android.content.ContentUris
 import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "songs")
@@ -22,6 +24,11 @@ data class Song(
     var track: Int
 ) {
 
+    @Ignore
+    private val sArtworkUri = Uri
+        .parse("content://media/external/audio/albumart");
+
+
     constructor(cursor: Cursor) : this(
         cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)),
         cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)),
@@ -36,5 +43,8 @@ data class Song(
         cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK))
     )
 
-    fun getUri() = Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id.toString())
+    fun getUri(): Uri =
+        Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id.toString())
+
+    fun getAlbumCoverUri(): Uri = ContentUris.withAppendedId(sArtworkUri, albumId)
 }

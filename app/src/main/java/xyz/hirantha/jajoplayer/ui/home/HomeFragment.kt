@@ -14,20 +14,26 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.home_fragment.*
 import kotlinx.android.synthetic.main.player_bottom_sheet.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
+import org.threeten.bp.Duration
 
 import xyz.hirantha.jajoplayer.R
 import xyz.hirantha.jajoplayer.internal.Playable
 import xyz.hirantha.jajoplayer.internal.ScopedFragment
+import xyz.hirantha.jajoplayer.internal.toMMSS
 import xyz.hirantha.jajoplayer.models.Song
 import xyz.hirantha.jajoplayer.notification.CreateNotification
 import xyz.hirantha.jajoplayer.player.JajoPlayer
@@ -115,10 +121,53 @@ class HomeFragment : ScopedFragment(), KodeinAware {
             songs = it
         })
 
-        btn_play.setOnClickListener { _ ->
-            //            if (isPlaying) onTrackPause()
+//        btn_play.setOnClickListener { _ ->
+        //            if (isPlaying) onTrackPause()
 //            else onTrackPlay()
+//        }
+
+        jajoPlayer.currentSong().observe(viewLifecycleOwner, Observer {
+            if (it == null) return@Observer
+            Glide.with(context!!)
+                .load(it.getAlbumCoverUri())
+                .centerCrop()
+                .placeholder(R.drawable.song)
+                .error(R.drawable.song)
+                .into(img_song_cover)
+            tv_song_title.text = it.title
+
+            val duration = Duration.ofMillis(it.duration)
+            tv_song_duration.text = duration.toMMSS()
+        })
+
+        GlobalScope.launch(Dispatchers.Main) {
+            while (true) {
+                if (jajoPlayer.isPlaying()) {
+                    val duration = Duration.ofMillis(jajoPlayer.getCurrentPosition().toLong())
+                    tv_current_position.text = duration.toMMSS()
+                }
+                delay(1000)
+            }
         }
+
+        jajoPlayer.playing.observe(viewLifecycleOwner, Observer {
+            if (it == null) return@Observer
+            if (it) {
+                btn_play_pause.setImageResource(R.drawable.ic_pause)
+            } else {
+                btn_play_pause.setImageResource(R.drawable.ic_play_arrow)
+            }
+        })
+
+        btn_play_pause.setOnClickListener {
+            if (jajoPlayer.isPlaying()) {
+                jajoPlayer.pause()
+            } else {
+                jajoPlayer.start()
+            }
+        }
+
+
     }
 
     private fun List<Song>.toSongItems(): List<SongListItem> {

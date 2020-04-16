@@ -14,12 +14,10 @@ import xyz.hirantha.jajoplayer.models.Song
 class SongListItem(private val context: Context, val song: Song) : Item() {
 
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        val sArtworkUri = Uri
-            .parse("content://media/external/audio/albumart");
 
         viewHolder.apply {
             Glide.with(context)
-                .load(ContentUris.withAppendedId(sArtworkUri, song.albumId))
+                .load(song.getAlbumCoverUri())
                 .centerCrop()
                 .placeholder(R.drawable.song)
                 .error(R.drawable.song)
@@ -28,7 +26,7 @@ class SongListItem(private val context: Context, val song: Song) : Item() {
             tv_name.text = song.title
             tv_artist.text = song.artistName
             val duration = Duration.ofMillis(song.duration)
-            tv_duration.setText("${duration.toMinutes()}:${duration.seconds % 60}")
+            tv_duration.text = "${duration.toMinutes()}:${duration.seconds % 60}"
         }
     }
 
