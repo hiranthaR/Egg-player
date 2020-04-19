@@ -26,7 +26,7 @@ class PlayListHandlerImpl(
     override val kodein: Kodein by closestKodein(context)
     private val _songs by lazyDeferred { mediaRepository.getSongs() }
     private var songs: List<Song>? = null
-    private var currentSongId = 0
+    private var currentSongId = -1
     override val currentSong: LiveData<Song> get() = _currentSong
     private val _currentSong = MutableLiveData<Song>()
 
@@ -59,6 +59,7 @@ class PlayListHandlerImpl(
 
     override fun playSong(song: Song, mp: MediaPlayer) {
         songs?.let {
+            if (currentSongId == it.indexOf(song)) return
             currentSongId = it.indexOf(song)
             if (currentSongId == -1) currentSongId = 0
             _currentSong.postValue(it[currentSongId])

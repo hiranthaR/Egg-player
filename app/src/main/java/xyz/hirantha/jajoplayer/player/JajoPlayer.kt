@@ -15,7 +15,6 @@ class JajoPlayer(private val playListHandler: PlayListHandler) {
     }
 
     fun playSong(song: Song) {
-        _playing.postValue(false)
         playListHandler.playSong(song, mediaPlayer)
         _playing.postValue(true)
     }

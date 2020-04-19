@@ -1,5 +1,6 @@
 package xyz.hirantha.jajoplayer.ui.home
 
+import android.animation.Animator
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
@@ -8,6 +9,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -121,10 +123,24 @@ class HomeFragment : ScopedFragment(), KodeinAware {
             songs = it
         })
 
-//        btn_play.setOnClickListener { _ ->
-        //            if (isPlaying) onTrackPause()
-//            else onTrackPlay()
-//        }
+        bottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                title_panel_expanded.animate().alpha(slideOffset)
+                title_panel_collapsed.animate().alpha(1 - slideOffset)
+            }
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    title_panel_collapsed.visibility = View.GONE
+                    title_panel_expanded.visibility = View.VISIBLE
+                }
+                if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    title_panel_collapsed.visibility = View.VISIBLE
+                    title_panel_expanded.visibility = View.GONE
+                }
+            }
+        })
 
         jajoPlayer.currentSong().observe(viewLifecycleOwner, Observer {
             if (it == null) return@Observer
