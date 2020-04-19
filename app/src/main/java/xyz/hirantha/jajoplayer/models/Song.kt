@@ -47,4 +47,9 @@ data class Song(
         Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id.toString())
 
     fun getAlbumCoverUri(): Uri = ContentUris.withAppendedId(sArtworkUri, albumId)
+
+    override fun equals(other: Any?): Boolean {
+        val song = other as? Song
+        return song?.id == this.id
+    }
 }

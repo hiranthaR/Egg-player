@@ -10,6 +10,8 @@ import org.kodein.di.generic.instance
 import org.kodein.di.generic.provider
 import org.kodein.di.generic.singleton
 import xyz.hirantha.jajoplayer.data.db.AppDatabase
+import xyz.hirantha.jajoplayer.data.providers.PlayerStateProvider
+import xyz.hirantha.jajoplayer.data.providers.PlayerStateProviderImpl
 import xyz.hirantha.jajoplayer.data.repository.MediaRepository
 import xyz.hirantha.jajoplayer.data.repository.MediaRepositoryImpl
 import xyz.hirantha.jajoplayer.player.JajoPlayer
@@ -31,6 +33,9 @@ class JajoPlayerApplication : MultiDexApplication(), KodeinAware {
         bind() from singleton { AppDatabase(instance()) }
         bind() from singleton { instance<AppDatabase>().getSongsDao() }
 
+        // providers
+        bind<PlayerStateProvider>() with singleton { PlayerStateProviderImpl(instance()) }
+
         bind<MediaRepository>() with singleton {
             MediaRepositoryImpl(instance(), instance())
         }
@@ -38,6 +43,6 @@ class JajoPlayerApplication : MultiDexApplication(), KodeinAware {
         bind<PlayListHandler>() with singleton { PlayListHandlerImpl(instance(), instance()) }
         bind() from singleton { JajoPlayer(instance()) }
 
-        bind() from provider { HomeViewModelFactory(instance(),instance()) }
+        bind() from provider { HomeViewModelFactory(instance(), instance()) }
     }
 }
