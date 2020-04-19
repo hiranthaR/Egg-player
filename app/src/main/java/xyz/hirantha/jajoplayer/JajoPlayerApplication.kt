@@ -17,8 +17,8 @@ import xyz.hirantha.jajoplayer.data.repository.MediaRepositoryImpl
 import xyz.hirantha.jajoplayer.data.repository.Repository
 import xyz.hirantha.jajoplayer.data.repository.RepositoryImpl
 import xyz.hirantha.jajoplayer.player.JajoPlayer
-import xyz.hirantha.jajoplayer.player.PlayListHandler
-import xyz.hirantha.jajoplayer.player.PlayListHandlerImpl
+import xyz.hirantha.jajoplayer.player.PlaylistHandler
+import xyz.hirantha.jajoplayer.player.PlaylistHandlerImpl
 import xyz.hirantha.jajoplayer.ui.home.HomeViewModelFactory
 
 class JajoPlayerApplication : MultiDexApplication(), KodeinAware {
@@ -45,8 +45,8 @@ class JajoPlayerApplication : MultiDexApplication(), KodeinAware {
             RepositoryImpl(instance())
         }
 
-        bind<PlayListHandler>() with singleton { PlayListHandlerImpl(instance(), instance()) }
-        bind() from singleton { JajoPlayer(instance()) }
+        bind<PlaylistHandler>() with singleton { PlaylistHandlerImpl(instance(), instance(), instance()) }
+        bind() from singleton { JajoPlayer(instance(),instance()) }
 
         bind() from provider { HomeViewModelFactory(instance(), instance()) }
     }

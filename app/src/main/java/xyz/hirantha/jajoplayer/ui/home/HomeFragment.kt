@@ -142,7 +142,7 @@ class HomeFragment : ScopedFragment(), KodeinAware {
             }
         })
 
-        jajoPlayer.currentSong().observe(viewLifecycleOwner, Observer {
+        jajoPlayer.currentSong.observe(viewLifecycleOwner, Observer {
             if (it == null) return@Observer
             Glide.with(context!!)
                 .load(it.getAlbumCoverUri())
@@ -152,7 +152,7 @@ class HomeFragment : ScopedFragment(), KodeinAware {
                 .into(img_song_cover)
             tv_song_title.text = it.title
 
-            val duration = Duration.ofMillis(it.duration)
+            val duration = Duration.ofMillis(jajoPlayer.getDuration().toLong())
             tv_song_duration.text = duration.toMMSS()
         })
 
@@ -183,7 +183,8 @@ class HomeFragment : ScopedFragment(), KodeinAware {
             }
         }
 
-
+        btn_next.setOnClickListener { jajoPlayer.playNextSong() }
+        btn_previous.setOnClickListener { jajoPlayer.playPreviousSong() }
     }
 
     private fun List<Song>.toSongItems(): List<SongListItem> {

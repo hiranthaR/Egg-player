@@ -48,8 +48,4 @@ data class Song(
 
     fun getAlbumCoverUri(): Uri = ContentUris.withAppendedId(sArtworkUri, albumId)
 
-    override fun equals(other: Any?): Boolean {
-        val song = other as? Song
-        return song?.id == this.id
-    }
 }
