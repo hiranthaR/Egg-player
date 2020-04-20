@@ -9,6 +9,7 @@ import com.xwray.groupie.kotlinandroidextensions.Item
 import kotlinx.android.synthetic.main.row_song.*
 import org.threeten.bp.Duration
 import xyz.hirantha.jajoplayer.R
+import xyz.hirantha.jajoplayer.internal.getAlbumCoverUri
 import xyz.hirantha.jajoplayer.models.Song
 
 class SongListItem(private val context: Context, val song: Song) : Item() {

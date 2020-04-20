@@ -105,14 +105,13 @@
             android:background="#ddd"
             android:orientation="horizontal"
             android:paddingHorizontal="5dp"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/tv_song_title_expanded"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text=":sesdada"
                 android:textColor="#222"
                 android:textSize="24dp" />
 

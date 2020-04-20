@@ -45,8 +45,14 @@ class JajoPlayerApplication : MultiDexApplication(), KodeinAware {
             RepositoryImpl(instance())
         }
 
-        bind<PlaylistHandler>() with singleton { PlaylistHandlerImpl(instance(), instance(), instance()) }
-        bind() from singleton { JajoPlayer(instance(),instance()) }
+        bind<PlaylistHandler>() with singleton {
+            PlaylistHandlerImpl(
+                instance(),
+                instance(),
+                instance()
+            )
+        }
+        bind() from singleton { JajoPlayer(instance(), instance(), instance()) }
 
         bind() from provider { HomeViewModelFactory(instance(), instance()) }
     }

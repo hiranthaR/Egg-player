@@ -5,7 +5,7 @@ import java.util.*
 
 interface PlaylistHandler {
     val queue: Deque<Song>
-    fun bringSongToFront(song: Song)
+    fun bringSongToFront(song: Song): Boolean
     fun nextSong(): Song?
     fun previousSong(): Song?
 }

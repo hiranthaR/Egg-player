@@ -40,11 +40,15 @@ class PlaylistHandlerImpl(
         }
     }
 
-    override fun bringSongToFront(song: Song) {
-        while (queue.peekFirst() != song) {
+    override fun bringSongToFront(song: Song): Boolean {
+        var index = 0
+        while (queue.peekFirst() != song && index < queue.size) {
+            index++
             queue.addLast(queue.pollFirst())
         }
+        if (index >= queue.size) return false
         queue.addLast(queue.pollFirst())
+        return true
     }
 
     override fun nextSong(): Song? {
