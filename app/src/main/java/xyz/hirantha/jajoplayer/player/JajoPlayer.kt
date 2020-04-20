@@ -10,11 +10,13 @@ import kotlinx.coroutines.launch
 import xyz.hirantha.jajoplayer.data.repository.Repository
 import xyz.hirantha.jajoplayer.internal.getUri
 import xyz.hirantha.jajoplayer.models.Song
+import xyz.hirantha.jajoplayer.notification.NotificationManager
 
 class JajoPlayer(
     private val context: Context,
     private val playlistHandler: PlaylistHandler,
-    private val repository: Repository
+    private val repository: Repository,
+    private val notificationManager: NotificationManager
 ) :
     MediaPlayer.OnCompletionListener {
 
@@ -69,6 +71,7 @@ class JajoPlayer(
 
 
     private fun initSong(song: Song) {
+        notificationManager.initSong(song)
         repository.setLastPlayedSong(song)
         _currentSong.postValue(song)
         mediaPlayer.reset()
@@ -78,6 +81,7 @@ class JajoPlayer(
 
     fun start() {
         mediaPlayer.start()
+        notificationManager.createNotification(false)
         _playing.postValue(true)
     }
 
@@ -88,6 +92,7 @@ class JajoPlayer(
 
     fun pause() {
         mediaPlayer.pause()
+        notificationManager.createNotification(true)
         _playing.postValue(false)
     }
 

@@ -3,10 +3,6 @@ package xyz.hirantha.jajoplayer.ui.home
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -40,10 +36,8 @@ import xyz.hirantha.jajoplayer.internal.ScopedFragment
 import xyz.hirantha.jajoplayer.internal.getAlbumCoverUri
 import xyz.hirantha.jajoplayer.internal.toMMSS
 import xyz.hirantha.jajoplayer.models.Song
-import xyz.hirantha.jajoplayer.notification.CreateNotification
+import xyz.hirantha.jajoplayer.notification.CHANNEL_ID
 import xyz.hirantha.jajoplayer.player.JajoPlayer
-import xyz.hirantha.jajoplayer.services.OnClearFromRecentService
-import xyz.hirantha.jajoplayer.services.RECEIVER_INTENT
 import xyz.hirantha.jajoplayer.ui.listitems.SongListItem
 
 class HomeFragment : ScopedFragment(), KodeinAware {
@@ -51,35 +45,9 @@ class HomeFragment : ScopedFragment(), KodeinAware {
     override val kodein: Kodein by closestKodein()
     private lateinit var viewModel: HomeViewModel
     private val viewModelFactory: HomeViewModelFactory by instance()
-    private var notificationManager: NotificationManager? = null
-    private var position = 0
-    private var isPlaying = false
-    private var broadcastReceiver: BroadcastReceiver
-    private var songs: List<Song>? = null
-
     private val jajoPlayer: JajoPlayer by instance()
 
-    init {
-        broadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-//                when (intent?.extras?.getString(RECEIVER_INTENT_ACTION_NAME)) {
-//                    CreateNotification.ACTION_PREVIOUS -> {
-//                        onTrackPrevious()
-//                    }
-//                    CreateNotification.ACTION_PLAY -> {
-//                        onTrackPlay()
-//                    }
-//                    CreateNotification.ACTION_PAUSE -> {
-//                        onTrackPause()
-//                    }
-//                    CreateNotification.ACTION_NEXT -> {
-//                        onTrackNext()
-//                    }
-//                }
-            }
-
-        }
-    }
+    private var manager: NotificationManager? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -92,13 +60,19 @@ class HomeFragment : ScopedFragment(), KodeinAware {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(HomeViewModel::class.java)
         checkPermissions()
+        initNotificationChannel()
+    }
 
+    private fun initNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createChannel()
-            activity?.registerReceiver(broadcastReceiver, IntentFilter(RECEIVER_INTENT))
-            activity?.startService(Intent(context!!, OnClearFromRecentService::class.java))
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "jajoPlayer",
+                NotificationManager.IMPORTANCE_LOW
+            )
+            manager = activity?.getSystemService(android.app.NotificationManager::class.java)
+            manager?.createNotificationChannel(channel)
         }
-
     }
 
     private fun checkPermissions() {
@@ -183,6 +157,7 @@ class HomeFragment : ScopedFragment(), KodeinAware {
         btn_play_pause.setOnClickListener {
             if (jajoPlayer.isPlaying()) {
                 jajoPlayer.pause()
+                manager?.cancelAll()
             } else {
                 jajoPlayer.start()
             }
@@ -192,25 +167,10 @@ class HomeFragment : ScopedFragment(), KodeinAware {
         btn_previous.setOnClickListener { jajoPlayer.playPreviousSong() }
     }
 
-    private fun createChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationChannel = NotificationChannel(
-                CreateNotification.CANNEL_ID,
-                "Jajo Player",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            notificationManager = activity?.getSystemService(NotificationManager::class.java)
-            notificationManager?.apply {
-                createNotificationChannel(notificationChannel)
-            }
-        }
-    }
-
     private fun bindUI() = launch {
         viewModel.songs.await().observe(viewLifecycleOwner, Observer {
             if (it == null) return@Observer
             initRecyclerView(it.toSongItems())
-            songs = it
         })
     }
 
@@ -233,13 +193,5 @@ class HomeFragment : ScopedFragment(), KodeinAware {
             layoutManager = LinearLayoutManager(context)
             adapter = groupAdapter
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager?.cancelAll()
-        }
-        activity?.unregisterReceiver(broadcastReceiver)
     }
 }
