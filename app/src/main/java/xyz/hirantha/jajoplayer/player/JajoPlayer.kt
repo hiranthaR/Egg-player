@@ -28,6 +28,7 @@ class JajoPlayer(
 
     init {
         playlistHandler.songs.observeForever {
+            if (isPlaying()) return@observeForever
             if (it == null) return@observeForever
             val lastPlayedSong = repository.getLastPlayedSong()
             if (lastPlayedSong != null) {
@@ -81,7 +82,7 @@ class JajoPlayer(
 
     fun start() {
         mediaPlayer.start()
-        notificationManager.createNotification(false)
+        notificationManager.sendNotification(false)
         _playing.postValue(true)
     }
 
@@ -92,7 +93,7 @@ class JajoPlayer(
 
     fun pause() {
         mediaPlayer.pause()
-        notificationManager.createNotification(true)
+        notificationManager.sendNotification(true)
         _playing.postValue(false)
     }
 

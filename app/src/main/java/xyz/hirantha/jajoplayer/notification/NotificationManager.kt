@@ -1,5 +1,6 @@
 package xyz.hirantha.jajoplayer.notification
 
+import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -29,39 +30,38 @@ class NotificationManager(private val context: Context) {
         this.song = song
     }
 
-    fun createNotification(playButton: Boolean) {
+    fun getNotification(playButton: Boolean): Notification {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationManagerCompat = NotificationManagerCompat.from(context)
-            val mediaSessionCompat = MediaSessionCompat(context, "jajoPlayer")
+        val mediaSessionCompat = MediaSessionCompat(context, "jajoPlayer")
 
-            val icon = getIcon(song?.getAlbumCoverUri())
+        val icon = getIcon(song?.getAlbumCoverUri())
 
-            val btnPlay = if (playButton) R.drawable.ic_play_arrow else R.drawable.ic_pause
-            val btnNext = R.drawable.ic_skip_next
-            val btnPrevious = R.drawable.ic_skip_previous
+        val btnPlay = if (playButton) R.drawable.ic_play_arrow else R.drawable.ic_pause
+        val btnNext = R.drawable.ic_skip_next
+        val btnPrevious = R.drawable.ic_skip_previous
 
-            val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_music_note)
-                .setContentTitle(song?.title)
-                .setContentText(song?.artistName)
-                .setLargeIcon(icon)
-                .setOnlyAlertOnce(true)
-                .setShowWhen(false)
-                .setOngoing(true)
-                .addAction(btnPrevious, "Previous", getPendingIntent(ACTION_PREVIOUS))
-                .addAction(btnPlay, "Play", getPendingIntent(ACTION_PLAY))
-                .addAction(btnNext, "Next", getPendingIntent(ACTION_NEXT))
-                .setStyle(
-                    androidx.media.app.NotificationCompat.MediaStyle()
-                        .setShowActionsInCompactView(0, 1, 2)
-                        .setMediaSession(mediaSessionCompat.sessionToken)
-                )
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .build()
-
-            notificationManagerCompat.notify(1, notification)
-        }
+        return NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_music_note)
+            .setContentTitle(song?.title)
+            .setContentText(song?.artistName)
+            .setLargeIcon(icon)
+            .setOnlyAlertOnce(true)
+            .setShowWhen(false)
+            .setOngoing(true)
+            .addAction(btnPrevious, "Previous", getPendingIntent(ACTION_PREVIOUS))
+            .addAction(
+                btnPlay,
+                "Play",
+                getPendingIntent(if (playButton) ACTION_PLAY else ACTION_PAUSE)
+            )
+            .addAction(btnNext, "Next", getPendingIntent(ACTION_NEXT))
+            .setStyle(
+                androidx.media.app.NotificationCompat.MediaStyle()
+                    .setShowActionsInCompactView(0, 1, 2)
+                    .setMediaSession(mediaSessionCompat.sessionToken)
+            )
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
     }
 
     private fun getPendingIntent(action: String): PendingIntent? {
@@ -76,4 +76,9 @@ class NotificationManager(private val context: Context) {
     }
 
     private fun getIcon(uri: Uri?) = MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+
+    fun sendNotification(playButton: Boolean) {
+        val notificationManagerCompat = NotificationManagerCompat.from(context)
+        notificationManagerCompat.notify(1, getNotification(playButton))
+    }
 }
