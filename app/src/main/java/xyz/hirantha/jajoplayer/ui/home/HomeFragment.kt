@@ -1,5 +1,6 @@
 package xyz.hirantha.jajoplayer.ui.home
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
@@ -16,6 +17,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.home_fragment.*
@@ -85,8 +91,7 @@ class HomeFragment : ScopedFragment(), KodeinAware {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, viewModelFactory).get(HomeViewModel::class.java)
-        bindUI()
-        bindPlayerBottomSheet()
+        checkPermissions()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChannel()
@@ -94,6 +99,28 @@ class HomeFragment : ScopedFragment(), KodeinAware {
             activity?.startService(Intent(context!!, OnClearFromRecentService::class.java))
         }
 
+    }
+
+    private fun checkPermissions() {
+        Dexter.withActivity(activity).withPermissions(
+            listOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+        ).withListener(object : MultiplePermissionsListener {
+            override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                if (report != null && report.areAllPermissionsGranted()) {
+                    bindUI()
+                    bindPlayerBottomSheet()
+                }
+            }
+
+            override fun onPermissionRationaleShouldBeShown(
+                permissions: MutableList<PermissionRequest>?,
+                token: PermissionToken?
+            ) {
+
+            }
+        }).check()
     }
 
     private fun bindPlayerBottomSheet() {
@@ -128,6 +155,7 @@ class HomeFragment : ScopedFragment(), KodeinAware {
                 .error(R.drawable.song)
                 .into(img_song_cover)
             tv_song_title.text = it.title
+            tv_song_title_expanded.text = it.title
 
             val duration = Duration.ofMillis(jajoPlayer.getDuration().toLong())
             tv_song_duration.text = duration.toMMSS()
