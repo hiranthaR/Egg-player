@@ -1,6 +1,8 @@
 package xyz.hirantha.jajoplayer.player
 
 import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -25,18 +27,22 @@ class PlaylistHandlerImpl(
     override val coroutineContext: CoroutineContext get() = job + Dispatchers.Main
     override val kodein: Kodein by closestKodein(context)
 
-    private val songs by lazyDeferred { mediaRepository.getSongs() }
-    override val queue: Deque<Song> = LinkedList<Song>()
+    private val songsList by lazyDeferred { mediaRepository.getSongs() }
+    private val queue: Deque<Song> = LinkedList<Song>()
+
+    override val songs: LiveData<List<Song>> get() = _songs
+    private val _songs = MutableLiveData<List<Song>>()
 
     init {
         observeSongs()
     }
 
     private fun observeSongs() = launch {
-        songs.await().observeForever {
+        songsList.await().observeForever {
             if (it == null) return@observeForever
             queue.clear()
             queue.addAll(it)
+            _songs.postValue(it)
         }
     }
 
