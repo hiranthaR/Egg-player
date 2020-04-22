@@ -123,13 +123,23 @@
                 android:textSize="20dp" />
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/img_song_cover_expanded"
-            android:src="@drawable/song"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
+        <com.bosphere.fadingedgelayout.FadingEdgeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="40dp" />
+            android:layout_marginTop="40dp"
+            app:fel_edge="bottom|top|left|right"
+            app:fel_size_bottom="10dp"
+            app:fel_size_left="10dp"
+            app:fel_size_right="10dp"
+            app:fel_size_top="10dp">
+            <ImageView
+                android:id="@+id/img_song_cover_expanded"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:src="@drawable/song" />
+        </com.bosphere.fadingedgelayout.FadingEdgeLayout>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

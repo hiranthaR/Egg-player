@@ -36,6 +36,7 @@ import xyz.hirantha.jajoplayer.internal.getAlbumCoverUri
 import xyz.hirantha.jajoplayer.internal.toMMSS
 import xyz.hirantha.jajoplayer.models.Song
 import xyz.hirantha.jajoplayer.notification.CHANNEL_ID
+import xyz.hirantha.jajoplayer.notification.NOTIFICATION_EXTRA_BY_NOTIFICATION
 import xyz.hirantha.jajoplayer.player.JajoPlayer
 import xyz.hirantha.jajoplayer.services.PlayerService
 import xyz.hirantha.jajoplayer.ui.listitems.SongListItem
@@ -101,7 +102,6 @@ class HomeFragment : ScopedFragment(), KodeinAware {
 
     private fun bindPlayerBottomSheet() {
         val bottomSheetBehavior = BottomSheetBehavior.from(player_bottom_sheet)
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
 
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
@@ -130,6 +130,14 @@ class HomeFragment : ScopedFragment(), KodeinAware {
                 .placeholder(R.drawable.song)
                 .error(R.drawable.song)
                 .into(img_song_cover)
+
+            Glide.with(context!!)
+                .load(it.getAlbumCoverUri())
+                .centerCrop()
+                .placeholder(R.drawable.song)
+                .error(R.drawable.song)
+                .into(img_song_cover_expanded)
+
             tv_song_title.text = it.title
             tv_song_title_expanded.text = it.title
 

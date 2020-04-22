@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.provider.MediaStore
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.core.app.NotificationCompat
@@ -14,6 +13,8 @@ import xyz.hirantha.jajoplayer.R
 import xyz.hirantha.jajoplayer.internal.getAlbumCoverUri
 import xyz.hirantha.jajoplayer.models.Song
 import xyz.hirantha.jajoplayer.services.NotificationActionService
+import xyz.hirantha.jajoplayer.ui.MainActivity
+
 
 const val CHANNEL_ID = "xyz.hirantha.jajoplayer.notification"
 
@@ -40,11 +41,19 @@ class NotificationManager(private val context: Context) {
         val btnNext = R.drawable.ic_skip_next
         val btnPrevious = R.drawable.ic_skip_previous
 
+        val mainActivityIntent =
+            Intent(context, MainActivity::class.java)
+        val contentIntent = PendingIntent.getActivity(
+            context, 0, mainActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+
         return NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_music_note)
             .setContentTitle(song?.title)
             .setContentText(song?.artistName)
             .setLargeIcon(icon)
+            .setContentIntent(contentIntent)
             .setOnlyAlertOnce(true)
             .setShowWhen(false)
             .setOngoing(true)
