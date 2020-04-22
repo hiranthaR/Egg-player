@@ -36,7 +36,6 @@ import xyz.hirantha.jajoplayer.internal.getAlbumCoverUri
 import xyz.hirantha.jajoplayer.internal.toMMSS
 import xyz.hirantha.jajoplayer.models.Song
 import xyz.hirantha.jajoplayer.notification.CHANNEL_ID
-import xyz.hirantha.jajoplayer.notification.NOTIFICATION_EXTRA_BY_NOTIFICATION
 import xyz.hirantha.jajoplayer.player.JajoPlayer
 import xyz.hirantha.jajoplayer.services.PlayerService
 import xyz.hirantha.jajoplayer.ui.listitems.SongListItem

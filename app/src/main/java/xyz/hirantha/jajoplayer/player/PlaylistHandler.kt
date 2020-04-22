@@ -8,5 +8,6 @@ interface PlaylistHandler {
     val songs: LiveData<List<Song>>
     fun bringSongToFront(song: Song): Boolean
     fun nextSong(): Song?
+    fun currentSong(): Song?
     fun previousSong(): Song?
 }

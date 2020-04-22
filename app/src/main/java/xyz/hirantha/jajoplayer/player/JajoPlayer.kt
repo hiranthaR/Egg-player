@@ -2,6 +2,7 @@ package xyz.hirantha.jajoplayer.player
 
 import android.content.Context
 import android.media.MediaPlayer
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
@@ -30,13 +31,9 @@ class JajoPlayer(
         playlistHandler.songs.observeForever {
             if (isPlaying()) return@observeForever
             if (it == null) return@observeForever
-            val lastPlayedSong = repository.getLastPlayedSong()
-            if (lastPlayedSong != null) {
-                if (playlistHandler.bringSongToFront(lastPlayedSong)) {
-                    initSong(lastPlayedSong)
-                } else {
-                    playlistHandler.nextSong()?.let { song -> initSong(song) }
-                }
+            val currentSong = playlistHandler.currentSong()
+            if (currentSong != null) {
+                initSong(currentSong)
             } else {
                 playlistHandler.nextSong()?.let { song -> initSong(song) }
             }

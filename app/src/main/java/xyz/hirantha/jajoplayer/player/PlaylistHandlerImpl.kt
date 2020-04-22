@@ -1,6 +1,7 @@
 package xyz.hirantha.jajoplayer.player
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
@@ -43,6 +44,8 @@ class PlaylistHandlerImpl(
             queue.clear()
             queue.addAll(it)
             _songs.postValue(it)
+            val lastPlayedSong = repository.getLastPlayedSong()
+            lastPlayedSong?.let { song -> bringSongToFront(song) }
         }
     }
 
@@ -62,6 +65,8 @@ class PlaylistHandlerImpl(
         queue.addLast(song)
         return song
     }
+
+    override fun currentSong(): Song? = queue.peekLast()
 
     override fun previousSong(): Song? {
         val song = queue.pollLast()

@@ -44,7 +44,7 @@ class NotificationManager(private val context: Context) {
         val mainActivityIntent =
             Intent(context, MainActivity::class.java)
         val contentIntent = PendingIntent.getActivity(
-            context, 0, mainActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT
+            context, 0, mainActivityIntent, 0
         )
 
 
