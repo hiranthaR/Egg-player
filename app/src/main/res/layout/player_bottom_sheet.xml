@@ -21,8 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:orientation="horizontal"
-            android:paddingHorizontal="5dp"
-            app:layout_constraintTop_toTopOf="parent">
+            android:paddingHorizontal="5dp">
 
             <ImageView
                 android:id="@+id/img_song_cover"
@@ -111,8 +110,7 @@
             android:layout_height="?attr/actionBarSize"
             android:orientation="horizontal"
             android:paddingHorizontal="5dp"
-            android:visibility="gone"
-            app:layout_constraintTop_toTopOf="parent">
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/tv_song_title_expanded"
@@ -133,6 +131,7 @@
             app:fel_size_left="10dp"
             app:fel_size_right="10dp"
             app:fel_size_top="10dp">
+
             <ImageView
                 android:id="@+id/img_song_cover_expanded"
                 android:layout_width="300dp"
@@ -140,6 +139,111 @@
                 android:src="@drawable/song" />
         </com.bosphere.fadingedgelayout.FadingEdgeLayout>
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/tv_artist_expanded"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textColor="#ccc"
+            android:textSize="19dp" />
 
+        <TextView
+            android:id="@+id/tv_album_name_expanded"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textColor="#aaa"
+            android:textSize="17dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_current_position_expanded"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00"
+                android:textColor="@android:color/white"
+                android:textSize="18dp" />
+
+            <SeekBar
+                android:id="@+id/sb_song_progress"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:progress="10"
+                android:progressTint="@android:color/white"
+                android:thumbTint="@android:color/white" />
+
+            <TextView
+                android:id="@+id/tv_song_duration_expanded"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00"
+                android:textColor="@android:color/white"
+                android:textSize="18dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btn_shuffle_expanded"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@android:color/transparent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_shuffle"
+                android:tint="@android:color/darker_gray" />
+
+            <ImageButton
+                android:id="@+id/btn_previous_expanded"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="20dp"
+                android:background="@android:color/transparent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_skip_previous"
+                android:tint="@android:color/white" />
+
+            <ImageButton
+                android:id="@+id/btn_play_pause_expanded"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@android:color/transparent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_play_arrow"
+                android:tint="@android:color/white" />
+
+            <ImageButton
+                android:id="@+id/btn_next_expanded"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginRight="20dp"
+                android:background="@android:color/transparent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_skip_next"
+                android:tint="@android:color/white" />
+
+            <ImageButton
+                android:id="@+id/btn_repeat_expanded"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@android:color/transparent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_repeat"
+                android:tint="@android:color/darker_gray" />
+        </LinearLayout>
+
+
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SeekBar
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -142,6 +143,30 @@ class HomeFragment : ScopedFragment(), KodeinAware {
 
             val duration = Duration.ofMillis(jajoPlayer.getDuration().toLong())
             tv_song_duration.text = duration.toMMSS()
+            tv_song_duration_expanded.text = duration.toMMSS()
+            sb_song_progress.progress = 0
+            sb_song_progress.max = jajoPlayer.getDuration()
+
+            tv_artist_expanded.text = it.artistName
+            tv_album_name_expanded.text = it.albumName
+        })
+
+        sb_song_progress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    jajoPlayer.seekTo(progress)
+                    sb_song_progress.progress = progress
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
         })
 
         durationJob = GlobalScope.launch(Dispatchers.Main) {
@@ -149,6 +174,8 @@ class HomeFragment : ScopedFragment(), KodeinAware {
                 if (jajoPlayer.isPlaying()) {
                     val duration = Duration.ofMillis(jajoPlayer.getCurrentPosition().toLong())
                     tv_current_position.text = duration.toMMSS()
+                    tv_current_position_expanded.text = duration.toMMSS()
+                    sb_song_progress.progress = jajoPlayer.getCurrentPosition()
                 }
                 delay(1000)
             }
@@ -158,39 +185,19 @@ class HomeFragment : ScopedFragment(), KodeinAware {
             if (it == null) return@Observer
             if (it) {
                 btn_play_pause.setImageResource(R.drawable.ic_pause)
+                btn_play_pause_expanded.setImageResource(R.drawable.ic_pause)
             } else {
                 btn_play_pause.setImageResource(R.drawable.ic_play_arrow)
+                btn_play_pause_expanded.setImageResource(R.drawable.ic_play_arrow)
             }
         })
 
-        btn_play_pause.setOnClickListener {
-            if (jajoPlayer.isPlaying()) {
-                jajoPlayer.pause()
-                manager?.cancelAll()
-                if (PlayerService.isRunning) {
-                    stopService()
-                }
-
-            } else {
-                jajoPlayer.start()
-                if (!PlayerService.isRunning) {
-                    startService()
-                }
-            }
-        }
-
-        btn_next.setOnClickListener {
-            jajoPlayer.playNextSong()
-            if (!PlayerService.isRunning) {
-                startService()
-            }
-        }
-        btn_previous.setOnClickListener {
-            jajoPlayer.playPreviousSong()
-            if (!PlayerService.isRunning) {
-                startService()
-            }
-        }
+        btn_play_pause.setOnClickListener { actionBtnPlay() }
+        btn_play_pause_expanded.setOnClickListener { actionBtnPlay() }
+        btn_next.setOnClickListener { actionBtnNext() }
+        btn_next_expanded.setOnClickListener { actionBtnNext() }
+        btn_previous.setOnClickListener { actionBtnPrevious() }
+        btn_previous_expanded.setOnClickListener { actionBtnPrevious() }
     }
 
     private fun bindUI() = launch {
@@ -246,5 +253,34 @@ class HomeFragment : ScopedFragment(), KodeinAware {
                 PlayerService::class.java
             )
         )
+    }
+
+    private fun actionBtnPlay() {
+        if (jajoPlayer.isPlaying()) {
+            jajoPlayer.pause()
+            manager?.cancelAll()
+            if (PlayerService.isRunning) {
+                stopService()
+            }
+        } else {
+            jajoPlayer.start()
+            if (!PlayerService.isRunning) {
+                startService()
+            }
+        }
+    }
+
+    private fun actionBtnNext() {
+        jajoPlayer.playNextSong()
+        if (!PlayerService.isRunning) {
+            startService()
+        }
+    }
+
+    private fun actionBtnPrevious() {
+        jajoPlayer.playPreviousSong()
+        if (!PlayerService.isRunning) {
+            startService()
+        }
     }
 }

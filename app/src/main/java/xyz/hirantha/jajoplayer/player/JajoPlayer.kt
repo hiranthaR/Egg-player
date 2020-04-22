@@ -58,7 +58,6 @@ class JajoPlayer(
         }
     }
 
-
     fun playPreviousSong() {
         val previousSong = playlistHandler.previousSong()
         previousSong?.let {
@@ -66,7 +65,6 @@ class JajoPlayer(
             start()
         }
     }
-
 
     private fun initSong(song: Song) {
         notificationManager.initSong(song)
