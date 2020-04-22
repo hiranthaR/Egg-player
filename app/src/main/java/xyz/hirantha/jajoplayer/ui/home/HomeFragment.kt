@@ -1,11 +1,14 @@
 package xyz.hirantha.jajoplayer.ui.home
 
 import android.Manifest
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Intent
+import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -81,7 +84,8 @@ class HomeFragment : ScopedFragment(), KodeinAware {
         Dexter.withActivity(activity).withPermissions(
             listOf(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.FOREGROUND_SERVICE
+                Manifest.permission.FOREGROUND_SERVICE,
+                Manifest.permission.MODIFY_AUDIO_SETTINGS
             )
         ).withListener(object : MultiplePermissionsListener {
             override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
@@ -149,6 +153,7 @@ class HomeFragment : ScopedFragment(), KodeinAware {
 
             tv_artist_expanded.text = it.artistName
             tv_album_name_expanded.text = it.albumName
+
         })
 
         sb_song_progress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {

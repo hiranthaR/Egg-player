@@ -18,14 +18,16 @@ class JajoPlayer(
     private val playlistHandler: PlaylistHandler,
     private val repository: Repository,
     private val notificationManager: NotificationManager
-) :
-    MediaPlayer.OnCompletionListener {
+) : MediaPlayer.OnCompletionListener {
 
     val playing: LiveData<Boolean> get() = _playing
     private val _playing = MutableLiveData<Boolean>(false)
 
     val currentSong: LiveData<Song> get() = _currentSong
     private val _currentSong = MutableLiveData<Song>()
+    private var mediaPlayer: MediaPlayer = MediaPlayer().apply {
+        setOnCompletionListener(this@JajoPlayer)
+    }
 
     init {
         playlistHandler.songs.observeForever {
@@ -38,10 +40,6 @@ class JajoPlayer(
                 playlistHandler.nextSong()?.let { song -> initSong(song) }
             }
         }
-    }
-
-    private var mediaPlayer: MediaPlayer = MediaPlayer().apply {
-        setOnCompletionListener(this@JajoPlayer)
     }
 
     fun playSong(song: Song) {
