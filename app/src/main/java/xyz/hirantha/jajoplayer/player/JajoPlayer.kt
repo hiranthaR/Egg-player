@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import xyz.hirantha.jajoplayer.data.repository.Repository
+import xyz.hirantha.jajoplayer.internal.Repeat
 import xyz.hirantha.jajoplayer.internal.getUri
 import xyz.hirantha.jajoplayer.models.Song
 import xyz.hirantha.jajoplayer.notification.NotificationManager
@@ -18,16 +19,14 @@ class JajoPlayer(
     private val playlistHandler: PlaylistHandler,
     private val repository: Repository,
     private val notificationManager: NotificationManager
-) : MediaPlayer.OnCompletionListener {
+) {
 
     val playing: LiveData<Boolean> get() = _playing
     private val _playing = MutableLiveData<Boolean>(false)
 
     val currentSong: LiveData<Song> get() = _currentSong
     private val _currentSong = MutableLiveData<Song>()
-    private var mediaPlayer: MediaPlayer = MediaPlayer().apply {
-        setOnCompletionListener(this@JajoPlayer)
-    }
+    private var mediaPlayer: MediaPlayer = MediaPlayer()
 
     init {
         playlistHandler.songs.observeForever {
@@ -38,6 +37,28 @@ class JajoPlayer(
                 initSong(currentSong)
             } else {
                 playlistHandler.nextSong()?.let { song -> initSong(song) }
+            }
+        }
+
+        repository.getRepeatState().observeForever {
+            if (it == null) return@observeForever
+            mediaPlayer.setOnCompletionListener { _ ->
+                when (it) {
+                    Repeat.NO_REPEAT -> {
+                        mediaPlayer.seekTo(0)
+                        pause()
+                    }
+                    Repeat.REPEAT_ALL -> {
+                        val song = playlistHandler.nextSong()
+                        song?.let { s ->
+                            initSong(s)
+                            start()
+                        }
+                    }
+                    Repeat.REPEAT_ONE -> {
+                        start()
+                    }
+                }
             }
         }
     }
@@ -94,13 +115,6 @@ class JajoPlayer(
     fun getDuration() = mediaPlayer.duration
     fun getCurrentPosition() = mediaPlayer.currentPosition
     fun seekTo(position: Int) = mediaPlayer.seekTo(position)
-
-    override fun onCompletion(mp: MediaPlayer?) {
-        val song = playlistHandler.nextSong()
-        song?.let {
-            initSong(it)
-            start()
-        }
-    }
+    fun queueSong() = playlistHandler.queueSong()
 }
 

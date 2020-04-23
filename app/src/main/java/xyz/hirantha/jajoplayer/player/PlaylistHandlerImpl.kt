@@ -73,4 +73,6 @@ class PlaylistHandlerImpl(
         queue.addFirst(song)
         return queue.peekLast()
     }
+
+    override fun queueSong(): Song? = queue.peekFirst()
 }

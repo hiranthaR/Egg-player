@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
@@ -35,6 +36,7 @@ import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 import org.threeten.bp.Duration
 import xyz.hirantha.jajoplayer.R
+import xyz.hirantha.jajoplayer.internal.Repeat
 import xyz.hirantha.jajoplayer.internal.ScopedFragment
 import xyz.hirantha.jajoplayer.internal.getAlbumCoverUri
 import xyz.hirantha.jajoplayer.internal.toMMSS
@@ -84,8 +86,7 @@ class HomeFragment : ScopedFragment(), KodeinAware {
         Dexter.withActivity(activity).withPermissions(
             listOf(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.FOREGROUND_SERVICE,
-                Manifest.permission.MODIFY_AUDIO_SETTINGS
+                Manifest.permission.FOREGROUND_SERVICE
             )
         ).withListener(object : MultiplePermissionsListener {
             override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
@@ -154,6 +155,7 @@ class HomeFragment : ScopedFragment(), KodeinAware {
             tv_artist_expanded.text = it.artistName
             tv_album_name_expanded.text = it.albumName
 
+            tv_next_song.text = jajoPlayer.queueSong()?.title
         })
 
         sb_song_progress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -161,6 +163,9 @@ class HomeFragment : ScopedFragment(), KodeinAware {
                 if (fromUser) {
                     jajoPlayer.seekTo(progress)
                     sb_song_progress.progress = progress
+                    val duration = Duration.ofMillis(progress.toLong())
+                    tv_current_position.text = duration.toMMSS()
+                    tv_current_position_expanded.text = duration.toMMSS()
                 }
             }
 
@@ -197,12 +202,38 @@ class HomeFragment : ScopedFragment(), KodeinAware {
             }
         })
 
+        viewModel.repeatState.observe(viewLifecycleOwner, Observer {
+            if (it == null) return@Observer
+            when (it) {
+                Repeat.NO_REPEAT -> {
+                    btn_repeat_expanded.setColorFilter(
+                        ContextCompat.getColor(context!!, android.R.color.darker_gray)
+
+                    )
+                    btn_repeat_expanded.setImageDrawable(context!!.getDrawable(R.drawable.ic_repeat))
+                }
+                Repeat.REPEAT_ALL -> {
+                    btn_repeat_expanded.setColorFilter(
+                        ContextCompat.getColor(context!!, android.R.color.white)
+                    )
+                    btn_repeat_expanded.setImageDrawable(context!!.getDrawable(R.drawable.ic_repeat))
+                }
+                Repeat.REPEAT_ONE -> {
+                    btn_repeat_expanded.setColorFilter(
+                        ContextCompat.getColor(context!!, android.R.color.white)
+                    )
+                    btn_repeat_expanded.setImageDrawable(context!!.getDrawable(R.drawable.ic_repeat_one))
+                }
+            }
+        })
+
         btn_play_pause.setOnClickListener { actionBtnPlay() }
         btn_play_pause_expanded.setOnClickListener { actionBtnPlay() }
         btn_next.setOnClickListener { actionBtnNext() }
         btn_next_expanded.setOnClickListener { actionBtnNext() }
         btn_previous.setOnClickListener { actionBtnPrevious() }
         btn_previous_expanded.setOnClickListener { actionBtnPrevious() }
+        btn_repeat_expanded.setOnClickListener { viewModel.toggleRepeatState() }
     }
 
     private fun bindUI() = launch {

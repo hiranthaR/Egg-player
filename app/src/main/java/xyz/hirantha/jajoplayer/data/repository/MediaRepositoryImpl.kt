@@ -47,6 +47,7 @@ class MediaRepositoryImpl(
                     songs.add(Song(cursor))
                 }
             }
+            cursor?.close()
             persistSongs(songs)
             return@withContext songsDao.getSongs()
         }

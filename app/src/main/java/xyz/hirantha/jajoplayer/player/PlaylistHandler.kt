@@ -10,4 +10,5 @@ interface PlaylistHandler {
     fun nextSong(): Song?
     fun currentSong(): Song?
     fun previousSong(): Song?
+    fun queueSong():Song?
 }
