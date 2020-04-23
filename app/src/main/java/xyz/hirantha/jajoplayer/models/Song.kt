@@ -21,7 +21,8 @@ data class Song(
     val year: Int,
     val dateAdded: Int,
     val dateModified: Long,
-    var track: Int
+    var track: Int,
+    var favorite: Boolean = false
 ) {
 
     constructor(cursor: Cursor) : this(
@@ -37,4 +38,11 @@ data class Song(
         cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)),
         cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK))
     )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other?.javaClass != javaClass) return false
+        other as Song
+        return other.id == id && other.title == title
+    }
 }

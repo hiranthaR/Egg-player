@@ -13,6 +13,9 @@ interface SongsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun upsertSongs(songs: List<Song>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun upsertSong(song: Song)
+
     @Query("SELECT * FROM songs;")
     fun getSongs(): LiveData<List<Song>>
 

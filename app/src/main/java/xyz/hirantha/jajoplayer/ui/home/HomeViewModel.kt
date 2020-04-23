@@ -5,6 +5,7 @@ import xyz.hirantha.jajoplayer.data.repository.MediaRepository
 import xyz.hirantha.jajoplayer.data.repository.Repository
 import xyz.hirantha.jajoplayer.internal.Repeat
 import xyz.hirantha.jajoplayer.internal.lazyDeferred
+import xyz.hirantha.jajoplayer.models.Song
 import xyz.hirantha.jajoplayer.player.PlaylistHandler
 
 class HomeViewModel(
@@ -14,4 +15,5 @@ class HomeViewModel(
     val songs by lazyDeferred { mediaRepository.getSongs() }
     val repeatState = repository.getRepeatState()
     fun toggleRepeatState() = repository.toggleRepeatState()
+    fun toggleFavorite(song: Song) = mediaRepository.toggleFavorite(song)
 }

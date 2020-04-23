@@ -53,10 +53,23 @@ class MediaRepositoryImpl(
         }
     }
 
+    override fun toggleFavorite(song: Song) {
+        GlobalScope.launch(Dispatchers.IO) {
+            song.favorite = !song.favorite
+            persistSong(song)
+        }
+    }
+
     private fun persistSongs(songs: List<Song>) {
         GlobalScope.launch(Dispatchers.IO) {
             songsDao.deleteAll()
             songsDao.upsertSongs(songs)
+        }
+    }
+
+    private fun persistSong(song: Song) {
+        GlobalScope.launch(Dispatchers.IO) {
+            songsDao.upsertSong(song)
         }
     }
 }

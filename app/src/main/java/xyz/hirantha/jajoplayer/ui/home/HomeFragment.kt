@@ -156,6 +156,14 @@ class HomeFragment : ScopedFragment(), KodeinAware {
             tv_album_name_expanded.text = it.albumName
 
             tv_next_song.text = jajoPlayer.queueSong()?.title
+
+            btn_favorite.setImageResource(if (it.favorite) R.drawable.ic_favorite else R.drawable.ic_favorite_border)
+            var favoriteTemp = it.favorite
+            btn_favorite.setOnClickListener { _ ->
+                viewModel.toggleFavorite(it)
+                favoriteTemp = !favoriteTemp
+                btn_favorite.setImageResource(if (favoriteTemp) R.drawable.ic_favorite else R.drawable.ic_favorite_border)
+            }
         })
 
         sb_song_progress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
