@@ -20,14 +20,18 @@ import xyz.hirantha.jajoplayer.notification.NotificationManager
 import xyz.hirantha.jajoplayer.player.JajoPlayer
 import xyz.hirantha.jajoplayer.player.PlaylistHandler
 import xyz.hirantha.jajoplayer.player.PlaylistHandlerImpl
+import xyz.hirantha.jajoplayer.ui.albums.AlbumsViewModelFactory
+import xyz.hirantha.jajoplayer.ui.artists.ArtistsViewModelFactory
 import xyz.hirantha.jajoplayer.ui.home.HomeViewModelFactory
+import xyz.hirantha.jajoplayer.ui.playlists.PlaylistsViewModelFactory
+import xyz.hirantha.jajoplayer.ui.songs.SongsViewModelFactory
 
 class JajoPlayerApplication : MultiDexApplication(), KodeinAware {
 
     override fun onCreate() {
         super.onCreate()
         AndroidThreeTen.init(this)
-     }
+    }
 
     override val kodein: Kodein = Kodein.lazy {
         import(androidXModule(this@JajoPlayerApplication))
@@ -56,6 +60,10 @@ class JajoPlayerApplication : MultiDexApplication(), KodeinAware {
         bind() from singleton { JajoPlayer(instance(), instance(), instance(), instance()) }
 
         bind() from provider { HomeViewModelFactory(instance(), instance()) }
+        bind() from provider { SongsViewModelFactory() }
+        bind() from provider { PlaylistsViewModelFactory() }
+        bind() from provider { ArtistsViewModelFactory() }
+        bind() from provider { AlbumsViewModelFactory() }
 
         bind() from singleton { NotificationManager(instance()) }
     }
